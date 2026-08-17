@@ -229,18 +229,19 @@ def model_info():
 #     - churn prediction
 #     - churn probability
 #     - no-churn probability
-#
+
+# =============================================================================
+# STEP 14: CUSTOMER CHURN PREDICTION ENDPOINT
 # =============================================================================
 
 @app.post("/predict")
 def predict_churn(customer: CustomerData):
 
-
     # =========================================================================
     # STEP 14.1: EXTRACT CUSTOMER DATA
     # =========================================================================
 
-customer_data = customer.data.copy()
+    customer_data = customer.data.copy()
 
     # =========================================================================
     # STEP 14.2: CHECK FOR MISSING FEATURES
