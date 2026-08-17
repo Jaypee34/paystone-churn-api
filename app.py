@@ -79,8 +79,7 @@ MODEL_PATH = MODEL_DIR / "CatBoost_churn_model.pkl"
 # STEP 5: DEFINE FEATURE SCHEMA PATH
 # =============================================================================
 
-FEATURE_SCHEMA_PATH = MODEL_DIR / "feature_columns.json"
-
+FEATURE_SCHEMA_PATH = BASE_DIR / "feature_columns.json"
 
 # =============================================================================
 # STEP 6: VERIFY FEATURE SCHEMA
@@ -241,98 +240,163 @@ def predict_churn(customer: CustomerData):
     # STEP 14.1: EXTRACT CUSTOMER DATA
     # =========================================================================
 
-    customer_data = customer.data
-
+customer_data = customer.data.copy()
 
     # =========================================================================
     # STEP 14.2: CHECK FOR MISSING FEATURES
     # =========================================================================
 
     missing_features = [
-
         feature
-
         for feature in FEATURE_COLUMNS
-
         if feature not in customer_data
-
     ]
-
 
     if missing_features:
 
         raise HTTPException(
-
             status_code=400,
-
             detail={
-
                 "error": "Missing required features",
-
                 "missing_features": missing_features
-
             }
-
         )
-
 
     # =========================================================================
     # STEP 14.3: CHECK FOR UNEXPECTED FEATURES
     # =========================================================================
 
     unexpected_features = [
-
         feature
-
         for feature in customer_data
-
         if feature not in FEATURE_COLUMNS
-
     ]
-
 
     if unexpected_features:
 
         raise HTTPException(
-
             status_code=400,
-
             detail={
-
                 "error": "Unexpected features supplied",
-
                 "unexpected_features": unexpected_features
-
             }
-
         )
-
 
     # =========================================================================
     # STEP 14.4: ARRANGE FEATURES IN MODEL ORDER
     # =========================================================================
 
     ordered_data = {
-
         feature: customer_data[feature]
-
         for feature in FEATURE_COLUMNS
-
     }
 
+    # =========================================================================
+    # STEP 14.5: PREPROCESS CATEGORICAL FEATURES
+    # =========================================================================
+    #
+    # The saved CatBoost model expects Income_Category and Card_Category
+    # as numerical values.
+    #
+    # The API receives the original human-readable category names.
+    # Therefore, convert them before sending the data to CatBoost.
+    #
+    # IMPORTANT:
+    # These mappings MUST match the mappings used during model training.
+    #
+    # =========================================================================
+
+    income_mapping = {
+        "Less than $40K": 0,
+        "$40K - $60K": 1,
+        "$60K - $80K": 2,
+        "$80K - $120K": 3,
+        "$120K +": 4,
+        "Unknown": 5
+    }
+
+    card_mapping = {
+        "Blue": 0,
+        "Silver": 1,
+        "Gold": 2,
+        "Platinum": 3
+    }
 
     # =========================================================================
-    # STEP 14.5: CREATE PREDICTION DATAFRAME
+    # STEP 14.5.1: CONVERT INCOME CATEGORY
+    # =========================================================================
+
+    if isinstance(ordered_data["Income_Category"], str):
+
+        income_value = ordered_data["Income_Category"]
+
+        if income_value not in income_mapping:
+
+            raise HTTPException(
+                status_code=400,
+                detail={
+                    "error": "Invalid Income_Category",
+                    "value": income_value,
+                    "allowed_values": list(
+                        income_mapping.keys()
+                    )
+                }
+            )
+
+        ordered_data["Income_Category"] = (
+            income_mapping[income_value]
+        )
+
+    # =========================================================================
+    # STEP 14.5.2: CONVERT CARD CATEGORY
+    # =========================================================================
+
+    if isinstance(ordered_data["Card_Category"], str):
+
+        card_value = ordered_data["Card_Category"]
+
+        if card_value not in card_mapping:
+
+            raise HTTPException(
+                status_code=400,
+                detail={
+                    "error": "Invalid Card_Category",
+                    "value": card_value,
+                    "allowed_values": list(
+                        card_mapping.keys()
+                    )
+                }
+            )
+
+        ordered_data["Card_Category"] = (
+            card_mapping[card_value]
+        )
+
+    # =========================================================================
+    # STEP 14.5.3: CREATE PREDICTION DATAFRAME
     # =========================================================================
 
     input_df = pd.DataFrame(
-
         [ordered_data],
-
         columns=FEATURE_COLUMNS
-
     )
 
+    # =========================================================================
+    # STEP 14.5.4: CONVERT NUMERIC FEATURES
+    # =========================================================================
+    #
+    # Make sure all remaining model inputs are numeric.
+    #
+    # Income_Category and Card_Category have already been converted above.
+    #
+    # =========================================================================
+
+    for feature in FEATURE_COLUMNS:
+
+        input_df[feature] = pd.to_numeric(
+            input_df[feature],
+            errors="raise"
+        )
 
     # =========================================================================
     # STEP 14.6: RUN CATBOOST PREDICTION
@@ -351,19 +415,12 @@ def predict_churn(customer: CustomerData):
     except Exception as error:
 
         raise HTTPException(
-
             status_code=500,
-
             detail={
-
                 "error": "Model prediction failed",
-
                 "message": str(error)
-
             }
-
         )
-
 
     # =========================================================================
     # STEP 14.7: EXTRACT PREDICTION RESULTS
@@ -373,16 +430,13 @@ def predict_churn(customer: CustomerData):
         prediction[0]
     )
 
-
     no_churn_probability = float(
         probabilities[0][0]
     )
 
-
     churn_probability = float(
         probabilities[0][1]
     )
-
 
     # =========================================================================
     # STEP 14.8: CREATE BUSINESS-FRIENDLY LABEL
@@ -395,7 +449,6 @@ def predict_churn(customer: CustomerData):
     else:
 
         churn_prediction = "No Churn"
-
 
     # =========================================================================
     # STEP 14.9: RETURN PREDICTION
