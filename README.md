@@ -1,5 +1,8 @@
 **PayStone Customer Churn API - GitHub Deployment Description**
-The PayStone Customer Churn Prediction API was deployed using a GitHub-based workflow. The trained CatBoost churn model was saved as a .pkl file together with the FastAPI application, feature schema, and dependency files in the GitHub repository.
+
+The PayStone Customer Churn Prediction API was deployed using a GitHub-based workflow. 
+The trained CatBoost churn model was saved as a .pkl file together with the FastAPI application, 
+feature schema, and dependency files in the GitHub repository.
 
 - Model Training: Trained a CatBoost customer churn classification model and saved it as CatBoost_churn_model.pkl.
 - FastAPI Development: Created app.py to expose the trained model through REST API endpoints.
