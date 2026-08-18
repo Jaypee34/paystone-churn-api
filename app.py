@@ -105,24 +105,76 @@ with open(
     feature_schema = json.load(file)
 
 
-FEATURE_COLUMNS = feature_schema["feature_columns"]
-
-NUMBER_OF_FEATURES = feature_schema["number_of_features"]
-
-
 # =============================================================================
-# STEP 8: VALIDATE FEATURE SCHEMA
+# STEP 8: HANDLE FEATURE SCHEMA FORMAT
+# =============================================================================
+#
+# feature_columns.json currently contains a LIST:
+#
+# [
+#     "Income_Category",
+#     "Card_Category",
+#     ...
+# ]
+#
+# Therefore, do NOT use:
+#
+#     feature_schema["feature_columns"]
+#
+# The code below supports both a list and a dictionary format.
+#
 # =============================================================================
 
-if NUMBER_OF_FEATURES != len(FEATURE_COLUMNS):
+if isinstance(feature_schema, list):
+
+    FEATURE_COLUMNS = feature_schema
+
+elif isinstance(feature_schema, dict):
+
+    if "feature_columns" not in feature_schema:
+
+        raise ValueError(
+            "feature_columns.json is a dictionary but "
+            "'feature_columns' was not found."
+        )
+
+    FEATURE_COLUMNS = feature_schema["feature_columns"]
+
+else:
 
     raise ValueError(
-        "Feature schema validation failed."
+        "Invalid feature_columns.json format. "
+        "Expected a list or dictionary."
     )
 
 
 # =============================================================================
-# STEP 9: LOAD CATBOOST MODEL
+# STEP 9: DEFINE NUMBER OF FEATURES
+# =============================================================================
+
+NUMBER_OF_FEATURES = len(FEATURE_COLUMNS)
+
+
+# =============================================================================
+# STEP 10: VALIDATE FEATURE SCHEMA
+# =============================================================================
+
+if NUMBER_OF_FEATURES != 25:
+
+    raise ValueError(
+        f"Expected 25 features, "
+        f"but found {NUMBER_OF_FEATURES}."
+    )
+
+
+if len(set(FEATURE_COLUMNS)) != NUMBER_OF_FEATURES:
+
+    raise ValueError(
+        "Feature schema contains duplicate feature names."
+    )
+
+# =============================================================================
+# STEP 11: LOAD CATBOOST MODEL
 # =============================================================================
 
 if not MODEL_PATH.exists():
@@ -138,7 +190,7 @@ tuned_catboost = joblib.load(
 
 
 # =============================================================================
-# STEP 10: CREATE FASTAPI APPLICATION
+# STEP 12: CREATE FASTAPI APPLICATION
 # =============================================================================
 
 app = FastAPI(
@@ -155,7 +207,7 @@ app = FastAPI(
 
 
 # =============================================================================
-# STEP 11: DEFINE CUSTOMER REQUEST FORMAT
+# STEP 13: DEFINE CUSTOMER REQUEST FORMAT
 # =============================================================================
 
 class CustomerData(BaseModel):
@@ -164,7 +216,7 @@ class CustomerData(BaseModel):
 
 
 # =============================================================================
-# STEP 12: HEALTH CHECK ENDPOINT
+# STEP 14: HEALTH CHECK ENDPOINT
 # =============================================================================
 #
 # GET /health
@@ -190,7 +242,7 @@ def health_check():
 
 
 # =============================================================================
-# STEP 13: MODEL INFORMATION ENDPOINT
+# STEP 15: MODEL INFORMATION ENDPOINT
 # =============================================================================
 #
 # GET /model-info
@@ -218,7 +270,7 @@ def model_info():
 
 
 # =============================================================================
-# STEP 14: CUSTOMER CHURN PREDICTION ENDPOINT
+# STEP 16: CUSTOMER CHURN PREDICTION ENDPOINT
 # =============================================================================
 #
 # POST /predict
@@ -230,21 +282,18 @@ def model_info():
 #     - churn probability
 #     - no-churn probability
 
-# =============================================================================
-# STEP 14: CUSTOMER CHURN PREDICTION ENDPOINT
-# =============================================================================
 
 @app.post("/predict")
 def predict_churn(customer: CustomerData):
 
     # =========================================================================
-    # STEP 14.1: EXTRACT CUSTOMER DATA
+    # STEP 16.1: EXTRACT CUSTOMER DATA
     # =========================================================================
 
     customer_data = customer.data.copy()
 
     # =========================================================================
-    # STEP 14.2: CHECK FOR MISSING FEATURES
+    # STEP 16.2: CHECK FOR MISSING FEATURES
     # =========================================================================
 
     missing_features = [
@@ -264,7 +313,7 @@ def predict_churn(customer: CustomerData):
         )
 
     # =========================================================================
-    # STEP 14.3: CHECK FOR UNEXPECTED FEATURES
+    # STEP 16.3: CHECK FOR UNEXPECTED FEATURES
     # =========================================================================
 
     unexpected_features = [
@@ -284,7 +333,7 @@ def predict_churn(customer: CustomerData):
         )
 
     # =========================================================================
-    # STEP 14.4: ARRANGE FEATURES IN MODEL ORDER
+    # STEP 16.4: ARRANGE FEATURES IN MODEL ORDER
     # =========================================================================
 
     ordered_data = {
@@ -293,7 +342,7 @@ def predict_churn(customer: CustomerData):
     }
 
     # =========================================================================
-    # STEP 14.5: PREPROCESS CATEGORICAL FEATURES
+    # STEP 16.5: PREPROCESS CATEGORICAL FEATURES
     # =========================================================================
     #
     # The saved CatBoost model expects Income_Category and Card_Category
@@ -324,7 +373,7 @@ def predict_churn(customer: CustomerData):
     }
 
     # =========================================================================
-    # STEP 14.5.1: CONVERT INCOME CATEGORY
+    # STEP 16.5.1: CONVERT INCOME CATEGORY
     # =========================================================================
 
     if isinstance(ordered_data["Income_Category"], str):
@@ -349,7 +398,7 @@ def predict_churn(customer: CustomerData):
         )
 
     # =========================================================================
-    # STEP 14.5.2: CONVERT CARD CATEGORY
+    # STEP 16.5.2: CONVERT CARD CATEGORY
     # =========================================================================
 
     if isinstance(ordered_data["Card_Category"], str):
@@ -374,7 +423,7 @@ def predict_churn(customer: CustomerData):
         )
 
     # =========================================================================
-    # STEP 14.5.3: CREATE PREDICTION DATAFRAME
+    # STEP 16.5.3: CREATE PREDICTION DATAFRAME
     # =========================================================================
 
     input_df = pd.DataFrame(
@@ -400,7 +449,7 @@ def predict_churn(customer: CustomerData):
         )
 
     # =========================================================================
-    # STEP 14.6: RUN CATBOOST PREDICTION
+    # STEP 16.6: RUN CATBOOST PREDICTION
     # =========================================================================
 
     try:
@@ -424,7 +473,7 @@ def predict_churn(customer: CustomerData):
         )
 
     # =========================================================================
-    # STEP 14.7: EXTRACT PREDICTION RESULTS
+    # STEP 16.7: EXTRACT PREDICTION RESULTS
     # =========================================================================
 
     predicted_class = int(
@@ -440,7 +489,7 @@ def predict_churn(customer: CustomerData):
     )
 
     # =========================================================================
-    # STEP 14.8: CREATE BUSINESS-FRIENDLY LABEL
+    # STEP 16.8: CREATE BUSINESS-FRIENDLY LABEL
     # =========================================================================
 
     if predicted_class == 1:
@@ -452,7 +501,7 @@ def predict_churn(customer: CustomerData):
         churn_prediction = "No Churn"
 
     # =========================================================================
-    # STEP 14.9: RETURN PREDICTION
+    # STEP 16.9: RETURN PREDICTION
     # =========================================================================
 
     return {
