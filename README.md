@@ -46,7 +46,7 @@ Random Forest
 XGBoost
 LightGBM
 CatBoost
-Production Model — CatBoost
+Production Model- CatBoost
 Metric	Result
 ROC-AUC	92.5%
 Accuracy	91.2%
