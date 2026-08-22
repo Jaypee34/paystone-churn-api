@@ -41,11 +41,11 @@ Retention Action
 
 Models evaluated:
 
-Logistic Regression
-Random Forest
-XGBoost
-LightGBM
-CatBoost
+Logistic Regression,
+Random Forest,
+XGBoost,
+LightGBM,
+CatBoost,
 Production Model- CatBoost
 Metric	Result
 ROC-AUC	92.5%
