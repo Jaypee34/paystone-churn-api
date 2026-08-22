@@ -2,11 +2,11 @@
 
 # PayStone Customer Retention Intelligence Platform
 
-### AI-Based Customer Churn Prediction & Explainable Analytics
+### AI-Based Bank Customer Churn Prediction & Explainable Analytics
 
-> An end-to-end machine learning and Explainable AI platform designed to identify customers at risk of churn, explain the drivers behind churn predictions, and support proactive customer-retention strategies.
+ An end-to-end machine learning and Explainable AI platform designed to identify customers at risk of churn, explain the drivers behind churn predictions, and support proactive customer-retention strategies.
 
----
+
 
 ## 📌 Project Overview
 
@@ -18,7 +18,7 @@ The solution moves PayStone from:
 
 **Reactive Churn Reporting → Predictive Risk Identification → Explainable Retention Action**
 
----
+
 
 ## 🎯 Business Objective
 
@@ -36,7 +36,7 @@ Customer churn can result in:
 
 The project therefore develops a predictive early-warning system capable of identifying high-risk customers and providing insights into **why they are likely to churn**.
 
----
+
 
 ## 💡 Solution Overview
 
@@ -51,13 +51,13 @@ The platform integrates the following capabilities:
 7. SHAP-based Explainable AI
 8. FastAPI model deployment
 9. Cloud hosting using Render
-10. Power BI business intelligence and monitoring
+10. Power BI business Monitoring
 
----
+
 
 ## 🏗️ End-to-End Architecture
 
-```text
+
                     CUSTOMER DATA
                          │
                          ▼
@@ -117,9 +117,9 @@ The platform integrates the following capabilities:
                          │
                          ▼
                 RETENTION ACTION
-```
 
----
+
+
 
 # 📊 Dataset
 
@@ -150,7 +150,7 @@ The dataset contains information relating to:
 * Inactivity
 * Behavioural changes between quarters
 
----
+
 
 # 🔍 Data Preparation & Feature Engineering
 
@@ -181,7 +181,7 @@ The modelling pipeline included:
 
 These engineered variables were designed to capture **customer engagement, behavioural deterioration, credit utilisation, and relationship depth**.
 
----
+
 
 # 📈 Exploratory Data Analysis
 
@@ -225,7 +225,7 @@ The analysis also considered:
 
 The overall analysis indicates that **behavioural and engagement characteristics provide stronger churn signals than most static demographic characteristics**.
 
----
+
 
 # 🤖 Machine Learning Model Development
 
@@ -280,7 +280,7 @@ The model correctly identified **204 of 325 actual churners**, resulting in a **
 
 XGBoost achieved a **92.2% ROC-AUC** and was retained as a validated alternative model.
 
----
+
 
 # 🧠 Explainable AI — SHAP
 
@@ -314,7 +314,7 @@ The SHAP analysis reinforces the central business finding:
 
 In particular, changes in transaction activity, inactivity, relationship depth, and contact frequency provide important early-warning signals.
 
----
+
 
 # 📊 Key Business Insights
 
@@ -352,9 +352,8 @@ This makes customer contact behaviour a potentially valuable retention signal.
 
 Demographic characteristics contribute to churn prediction, but the model indicates that **behavioural and engagement variables generally provide stronger predictive information**.
 
-Certain smaller segments, including Platinum cardholders and Doctorate-level customers, show elevated churn rates and should be investigated further using additional customer feedback and retention analysis.
+Certain smaller segments, including Platinum cardholders and Doctorate-level customers, show elevated churn rates and should be investigated further using additional customer feedback and retention analysis
 
----
 
 # 💼 Business Recommendations
 
@@ -368,7 +367,7 @@ Score the active customer base regularly using the production CatBoost model.
 
 Create risk tiers such as:
 
-```text
+
 HIGH RISK
    ↓
 Immediate Retention Intervention
@@ -380,7 +379,7 @@ Targeted Engagement
 LOW RISK
    ↓
 Standard Customer Management
-```
+
 
 ### 3. Monitor Behavioural Deterioration
 
@@ -414,7 +413,7 @@ Monitor:
 
 Retrain the model when customer behaviour or model performance changes materially.
 
----
+
 
 # 🚀 FastAPI Deployment
 
@@ -422,7 +421,6 @@ The trained CatBoost model was operationalised through a **FastAPI REST API**.
 
 ### Deployment Components
 
-```text
 CatBoost Model
       │
       ▼
@@ -440,9 +438,9 @@ Docker Container
       │
       ▼
 Render Cloud Deployment
-```
 
----
+
+
 
 # 🔌 Prediction API
 
@@ -450,18 +448,18 @@ The `/predict` endpoint accepts customer information and returns a churn predict
 
 ### API Response
 
-```json
+
 {
   "prediction": 1,
   "churn_prediction": "Churn",
   "churn_probability": 0.8995,
   "no_churn_probability": 0.1005
 }
-```
+
 
 The deployed API successfully returned a **89.95% predicted churn probability** for the test customer.
 
----
+
 
 # 🛡️ API Input Validation
 
@@ -479,7 +477,6 @@ The deployed model expects **25 features**.
 
 ### Model Feature Schema
 
-```text
 Income_Category
 Card_Category
 Education_Level_Doctorate
@@ -505,19 +502,19 @@ Available_Credit_Ratio
 Revolving_Balance_Ratio
 Contact_Frequency
 Inactivity_Ratio
-```
 
----
+
+
 
 # 📚 API Documentation
 
 FastAPI automatically provides interactive Swagger/OpenAPI documentation through:
 
-`/docs`
+
 
 The deployed application can be accessed through the public Render service.
 
----
+
 
 # 🔄 GitHub Deployment Workflow
 
@@ -525,7 +522,7 @@ The API was deployed using a GitHub-based CI/CD workflow.
 
 ### Deployment Process
 
-```text
+
 Model Training
       │
       ▼
@@ -574,9 +571,9 @@ paystone-churn-api/
 │   └── CatBoost_churn_model.pkl
 │
 └── README.md
-```
 
----
+
+
 
 # ☁️ Cloud Deployment
 
@@ -601,7 +598,6 @@ The FastAPI application was deployed to **Render** using Docker and GitHub integ
 | `/predict`    | POST   | Generate customer churn prediction    |
 | `/docs`       | GET    | Interactive Swagger API documentation |
 
----
 
 # 📊 Power BI Business Intelligence
 
@@ -646,7 +642,7 @@ Potential dashboard views include:
 * Segment-level drivers
 * Customer-level SHAP explanations
 
----
+
 
 # 🧩 Technology Stack
 
@@ -670,8 +666,7 @@ Potential dashboard views include:
 
 ### Visualisation
 
-* Matplotlib
-* Seaborn
+
 * Plotly
 
 ### Deployment & API
@@ -691,11 +686,10 @@ Potential dashboard views include:
 * Git
 * GitHub
 
----
+
 
 # 📁 Project Structure
 
-```text
 PayStone-Customer-Retention-Intelligence/
 │
 ├── data/
@@ -723,9 +717,8 @@ PayStone-Customer-Retention-Intelligence/
 │   └── model_performance.csv
 │
 └── README.md
-```
 
----
+
 
 # 🎯 Business Value
 
@@ -750,7 +743,7 @@ to:
 
 > **"Which customers are likely to churn next, why are they at risk, and what can we do about it?"**
 
----
+
 
 # 🔮 Future Enhancements
 
@@ -768,7 +761,6 @@ Potential future improvements include:
 * Automated Power BI data refresh
 * Integration with CRM platforms
 
----
 
 # ⚠️ Model Risk & Business Considerations
 
@@ -785,13 +777,12 @@ Before production use at scale, PayStone should:
 * Establish appropriate model governance
 * Ensure retention interventions are proportionate and commercially appropriate
 
----
 
 # 👩‍💻 Project Summary
 
 **PayStone Customer Retention Intelligence Platform** demonstrates an end-to-end machine learning lifecycle:
 
-```text
+
 Data
  ↓
 Data Quality
@@ -821,7 +812,7 @@ Render
 Power BI
  ↓
 Proactive Customer Retention
-```
+
 
 ### Key Achievement
 
