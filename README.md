@@ -90,13 +90,6 @@ model/feature_columns.json
 
 This allows the API to validate incoming data against the exact production model schema.
 
-Live API
-
-PayStone Live API
-
-Swagger Documentation
-
-PayStone API Documentation
 
 📊 Power BI
 
@@ -109,6 +102,7 @@ Customer segments
 Behavioural indicators
 High-value customers at risk
 SHAP churn drivers
+
 📁 Project Structure
 PayStone-Customer-Retention-Intelligence/
 │
