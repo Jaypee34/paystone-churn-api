@@ -11,33 +11,24 @@ Objective:
 
 Identify customers likely to churn before they leave and support targeted retention action.
 
-🏗️ Solution Architecture
-Customer Data
-     ↓
-Data Preparation
-     ↓
-Feature Engineering
-     ↓
-EDA
-     ↓
-Model Development
-     ↓
-CatBoost
-     ↓
-SHAP Explainability
-     ↓
-Churn Risk Scoring
-     ↓
-FastAPI
-     ↓
-Docker
-     ↓
-GitHub → Render
-     ↓
-Power BI
-     ↓
-Retention Action
-🤖 Machine Learning
+## 🏗️ Solution Architecture
+
+```mermaid
+flowchart TD
+    A[Customer Data] --> B[Data Preparation]
+    B --> C[Feature Engineering]
+    C --> D[EDA]
+    D --> E[Model Development]
+    E --> F[CatBoost Production Model]
+    F --> G[SHAP Explainability]
+    F --> H[Churn Risk Scoring]
+    G --> I[FastAPI REST API]
+    H --> I
+    I --> J[Docker]
+    J --> K[GitHub]
+    K --> L[Render Cloud]
+    L --> M[Power BI]
+    M --> N[Retention Action]
 
 Models evaluated:
 
